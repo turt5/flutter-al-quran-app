@@ -10,6 +10,7 @@ class Page1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
           child: Center(
         child: SizedBox(
@@ -71,7 +72,7 @@ class Page1 extends StatelessWidget {
                                   pageBuilder: (BuildContext context,
                                           Animation animation,
                                           Animation secondaryAnimation) =>
-                                     const Page2(),
+                                      const Page2(),
                                   transitionsBuilder: (context, animation,
                                       secondaryAnimation, child) {
                                     var begin = Offset(1.0, 0.0);

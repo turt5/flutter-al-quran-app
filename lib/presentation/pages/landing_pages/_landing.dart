@@ -15,16 +15,17 @@ class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
-      child: Center(
-        child: Container(
-            height: MediaQuery.of(context).size.height,
-            color: Colors.red,
-            width: 500,
-            child: PageView(
-              children: pages,
-            )),
-      ),
-    ));
+          child: Center(
+            child: Container(
+                height: MediaQuery.of(context).size.height,
+                color: Colors.red,
+                width: 500,
+                child: PageView(
+                  children: pages,
+                )),
+          ),
+        ));
   }
 }

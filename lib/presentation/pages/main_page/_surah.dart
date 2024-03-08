@@ -1,3 +1,4 @@
+import 'package:al_quran/data/_quran_service.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,18 +10,19 @@ import '../../widgets/_decrease_font.dart';
 import '../../widgets/_increase_font.dart';
 
 class SurahPage extends StatefulWidget {
-  const SurahPage(
-      {super.key,
-      required this.surah,
-      required this.index,
-      required this.surahEnglish,
-      required this.surahAudio,
-      required this.surahTranslate});
-  final Map<String, dynamic> surah;
+  SurahPage({
+    super.key,
+    // required this.surah,
+    required this.index,
+    // required this.surahEnglish,
+    // required this.surahAudio,
+    // required this.surahTranslate
+  });
+  Map<String, dynamic> surah = {};
   final int index;
-  final Map<String, dynamic> surahEnglish;
-  final Map<String, dynamic> surahAudio;
-  final Map<String, dynamic> surahTranslate;
+  Map<String, dynamic> surahEnglish = {};
+  Map<String, dynamic> surahAudio = {};
+  Map<String, dynamic> surahTranslate = {};
 
   @override
   State<SurahPage> createState() => _SurahPageState();
@@ -34,7 +36,7 @@ class _SurahPageState extends State<SurahPage> {
   @override
   void initState() {
     super.initState();
-    initPrefs();
+    loadData(widget.index);
     _assetsAudioPlayer = AssetsAudioPlayer();
     // Listen to player events
     _assetsAudioPlayer.playlistFinished.listen((finished) {
@@ -47,33 +49,62 @@ class _SurahPageState extends State<SurahPage> {
         playing = _assetsAudioPlayer.isPlaying.value;
       });
     });
+
+    initPrefs(); // Call initPrefs() here
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    // Dispose the player to release resources
-    _assetsAudioPlayer.dispose();
+  Future<void> loadData(int index) async {
+    try {
+      final data = await SurahArabic.fetchQuranData(index);
+      final dataTranslate =
+          await SurahEnglishTranslateService.fetchQuranData(widget.index);
+      final dataAudio = await SurahAudioService.fetchQuranData(widget.index);
+      final dataTranliteration =
+          await SurahEnglishTransliterationService.fetchQuranData(widget.index);
+
+      setState(() {
+        widget.surah = data;
+        widget.surahTranslate = dataTranslate;
+        widget.surahAudio = dataAudio;
+        widget.surahEnglish = dataTranliteration;
+      });
+
+      print(widget.surah = data['data']['surahs'][widget.index].length);
+    } catch (e) {
+      print("Error loading data: $e");
+    }
   }
 
-  void initPrefs() async {
+  Future<void> initPrefs() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       size = prefs.getDouble('font_size') ?? 18.0;
       activeIndex = prefs.getInt('active_index') ?? -1;
       activeSurah = prefs.getInt('active_surah') ?? -1;
     });
+    print(prefs.getString('active_Surah')); // You can access prefs here
   }
 
   var color = Colors.white;
-  var activeIndex = -1;
-  var activeSurah = -1;
+  var activeIndex;
+  var activeSurah;
   var playing = false;
   var clicked = false;
   var clickedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
+    if (widget.surah.isEmpty ||
+        widget.surahEnglish.isEmpty ||
+        widget.surahAudio.isEmpty ||
+        widget.surahTranslate.isEmpty) {
+      // Handle the case when JSON data is not loaded properly
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     final activeTextProvider = Provider.of<ActiveTextProvider>(context);
     double width = MediaQuery.of(context).size.width;
 
@@ -160,14 +191,6 @@ class _SurahPageState extends State<SurahPage> {
                           prefs.setInt('active_index', index);
                           prefs.setInt('active_surah', widget.surah['number']);
                           clicked = true;
-                        } else {
-                          // If already clicked, reset the color, activeIndex, activeTextProvider, and prefs
-                          color = CupertinoColors.white;
-                          activeIndex = -1;
-                          activeTextProvider.setActiveText('');
-                          prefs.remove('active_index');
-                          prefs.remove('active_surah');
-                          clicked = false;
                         }
                       });
                     },

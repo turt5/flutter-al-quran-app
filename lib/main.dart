@@ -7,14 +7,6 @@ import 'presentation/providers/_active_text_provider.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setDouble('font_size', 18.0);
-  prefs.setInt('active_index', -1);
-  prefs.setInt('active_surah', -1);
-  prefs.setString('active_text', '');
-  prefs.setBool('opened', false);
-  // Set 'opened' to true after initialization
-  await prefs.setBool('opened', true);
 
   runApp(
     MultiProvider(
@@ -28,24 +20,49 @@ void main(List<String> args) async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Future<bool> _result;
+
+  @override
+  void initState() {
+    super.initState();
+    _result = _init();
+  }
+
+  Future<bool> _init() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Check if 'opened' flag exists
+    bool opened = prefs.getBool('opened') ?? false;
+
+    if (!opened) {
+      // If 'opened' flag is false, set it to true
+      await prefs.setBool('opened', true);
+    }
+
+    print(opened);
+    return opened;
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FutureBuilder<SharedPreferences>(
-        future: SharedPreferences.getInstance(),
+      home: FutureBuilder<bool>(
+        future: _result,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            final prefs = snapshot.data!;
-            return prefs.getBool('opened') == false
-                ? const LandingPage()
-                : const IndexPage();
-          } else {
-            // Return a loading indicator while waiting for SharedPreferences to initialize.
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(body: Center(child: CircularProgressIndicator()));
+          } else {
+            final bool opened = snapshot.data ?? false;
+            return opened ? const LandingPage() : const IndexPage();
           }
         },
       ),

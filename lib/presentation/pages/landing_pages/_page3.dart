@@ -1,11 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main_page/_page_index.dart';
 
 class Page3 extends StatelessWidget {
   const Page3({super.key});
+
+  Future<void> setOpened() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('opened', true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +72,7 @@ class Page3 extends StatelessWidget {
                             backgroundColor: CupertinoColors.activeBlue,
                             foregroundColor: Colors.white),
                         onPressed: () {
+                          setOpened();
                           Navigator.push(
                               context,
                               PageRouteBuilder(
