@@ -154,25 +154,28 @@ class _IndexPageState extends State<IndexPage> {
           ),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: jsonData['data']['surahs'].length,
-              itemBuilder: (context, index) {
-                final surah = jsonData['data']['surahs'][index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SurahPage(
-                          index: index,
+            child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: jsonData['data']['surahs'].length,
+                itemBuilder: (context, index) {
+                  final surah = jsonData['data']['surahs'][index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SurahPage(
+                            index: index,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  child: SurahListItem(activeText: activeText, surah: surah),
-                );
-              },
+                      );
+                    },
+                    child: SurahListItem(activeText: activeText, surah: surah),
+                  );
+                },
+              ),
             ),
           ),
         ],
