@@ -1,4 +1,5 @@
 import 'package:al_quran/data/_quran_service.dart';
+import 'package:al_quran/presentation/widgets/_sajda_alert.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +7,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import '../../providers/_active_text_provider.dart';
+import '../../widgets/_appbar_surah_name.dart';
+import '../../widgets/_ayah_bottom_nav.dart';
 import '../../widgets/_decrease_font.dart';
 import '../../widgets/_increase_font.dart';
+import '../../widgets/_surah_arabic.dart';
+import '../../widgets/_surah_eng.dart';
+import '../../widgets/_surah_eng_meaning.dart';
+import '../../widgets/_surah_number.dart';
 
 class SurahPage extends StatefulWidget {
   SurahPage({
@@ -19,7 +26,7 @@ class SurahPage extends StatefulWidget {
     // required this.surahTranslate
   });
   Map<String, dynamic> surah = {};
-  final int index;
+  final index;
   Map<String, dynamic> surahEnglish = {};
   Map<String, dynamic> surahAudio = {};
   Map<String, dynamic> surahTranslate = {};
@@ -55,12 +62,12 @@ class _SurahPageState extends State<SurahPage> {
 
   Future<void> loadData(int index) async {
     try {
-      final data = await SurahArabic.fetchQuranData(index);
+      final data = await SurahArabicX.fetchQuranData(index);
       final dataTranslate =
-          await SurahEnglishTranslateService.fetchQuranData(widget.index);
-      final dataAudio = await SurahAudioService.fetchQuranData(widget.index);
+          await SurahEnglishTranslateService.fetchQuranData(index);
+      final dataAudio = await SurahAudioService.fetchQuranData(index);
       final dataTranliteration =
-          await SurahEnglishTransliterationService.fetchQuranData(widget.index);
+          await SurahEnglishTransliterationService.fetchQuranData(index);
 
       setState(() {
         widget.surah = data;
@@ -99,6 +106,7 @@ class _SurahPageState extends State<SurahPage> {
         widget.surahAudio.isEmpty ||
         widget.surahTranslate.isEmpty) {
       // Handle the case when JSON data is not loaded properly
+
       return Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
@@ -148,19 +156,7 @@ class _SurahPageState extends State<SurahPage> {
           ],
           toolbarHeight: 70,
           centerTitle: true,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("${widget.surah['name']}",
-                  style: GoogleFonts.inter(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black)),
-              const SizedBox(width: 5),
-              Text("(${widget.surah['englishName']})",
-                  style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
-            ],
-          )),
+          title: AppbarSurahName(widget: widget)),
       body: SafeArea(
           child: Center(
         child: Container(
@@ -168,253 +164,158 @@ class _SurahPageState extends State<SurahPage> {
           alignment: Alignment.center,
           child: ListView(
             children: [
-              Column(
-                children: List.generate(widget.surah['ayahs'].length, (index) {
-                  final ayah =
-                      widget.surah['ayahs'][index]; // Access the current ayah
-                  final ayahNumber = ayah[
-                      'numberInSurah']; // Access the 'number' property of the current ayah
-                  final surahName = widget.surah['englishName'];
-                  final ayahEnglish = widget.surahEnglish['ayahs'][index];
-                  final ayahVoice = widget.surahAudio['ayahs'][index];
-                  final ayahTranslate = widget.surahTranslate['ayahs'][index];
+              ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.surah['ayahs'].length,
+                  itemBuilder: (context, index) {
+                    final ayah =
+                        widget.surah['ayahs'][index]; // Access the current ayah
+                    final ayahNumber = ayah[
+                        'numberInSurah']; // Access the 'number' property of the current ayah
+                    final surahName = widget.surah['englishName'];
+                    final ayahEnglish = widget.surahEnglish['ayahs'][index];
+                    final ayahVoice = widget.surahAudio['ayahs'][index];
+                    final ayahTranslate = widget.surahTranslate['ayahs'][index];
 
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        if (!clicked) {
-                          // If not clicked, set the color, activeIndex, activeTextProvider, and prefs
-                          color = CupertinoColors.activeBlue;
-                          activeIndex = index;
-                          activeTextProvider
-                              .setActiveText(widget.surah['englishName']);
-                          prefs.setInt('active_index', index);
-                          prefs.setInt('active_surah', widget.surah['number']);
-                          clicked = true;
-                        }
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeIn,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.shade400,
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                            offset: const Offset(5, 5),
-                          ),
-                          BoxShadow(
-                            color: Colors.grey.shade100,
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                            offset: const Offset(-5, -5),
-                          )
-                        ],
-                        color: (index == activeIndex &&
-                                activeTextProvider.activeText == surahName)
-                            ? CupertinoColors.activeBlue
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          if (!clicked) {
+                            // If not clicked, set the color, activeIndex, activeTextProvider, and prefs
+                            color = CupertinoColors.activeBlue;
+                            activeIndex = index;
+                            activeTextProvider
+                                .setActiveText(widget.surah['englishName']);
+                            prefs.setInt('active_index', index);
+                            prefs.setInt(
+                                'active_surah', widget.surah['number']);
+                            clicked = true;
+                          }
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeIn,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade400,
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                              offset: const Offset(5, 5),
+                            ),
+                            BoxShadow(
+                              color: Colors.grey.shade100,
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                              offset: const Offset(-5, -5),
+                            )
+                          ],
+                          color: (index == activeIndex &&
+                                  activeTextProvider.activeText == surahName)
+                              ? CupertinoColors.activeBlue
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 20),
+                        child: Column(
+                          children: [
+                            SurahNumber(
+                                ayahNumber: ayahNumber,
+                                activeIndex: activeIndex,
+                                activeTextProvider: activeTextProvider,
+                                surahName: surahName),
+                            const SizedBox(height: 30),
+                            SurahArabic(
+                                ayah: ayah,
+                                width: width,
+                                size: size,
+                                activeIndex: activeIndex,
+                                activeTextProvider: activeTextProvider,
+                                surahName: surahName),
+                            const SizedBox(height: 15),
+                            Container(
+                              height: 2,
+                              width: double.infinity,
+                              // margin: EdgeInsets.symmetric(horizontal: 20),
+                              color: Colors.grey.shade300,
+                            ),
+                            const SizedBox(height: 15),
+                            SurahEnglish(
+                                ayahEnglish: ayahEnglish,
+                                size: size,
+                                activeIndex: activeIndex,
+                                activeTextProvider: activeTextProvider,
+                                surahName: surahName),
+                            const SizedBox(height: 15),
+                            Container(
+                              height: 2,
+                              width: double.infinity,
+                              // margin: EdgeInsets.symmetric(horizontal: 20),
+                              color: Colors.grey.shade300,
+                            ),
+                            const SizedBox(height: 15),
+                            SurahEnglishMeaning(
+                                ayahTranslate: ayahTranslate,
+                                size: size,
+                                activeIndex: activeIndex,
+                                activeTextProvider: activeTextProvider,
+                                surahName: surahName),
+                            const SizedBox(height: 40),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AyahBottomNavigation(
+                                    activeIndex: activeIndex,
+                                    activeTextProvider: activeTextProvider,
+                                    surahName: surahName,
+                                    index: index,
+                                    ayahEnglish: ayahEnglish),
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      clickedIndex = index;
+                                      if (!playing) {
+                                        _assetsAudioPlayer.open(
+                                            Audio.network(ayahVoice['audio']));
+                                        _assetsAudioPlayer
+                                            .play(); // Start playing immediately
+                                        playing = true;
+                                      } else {
+                                        _assetsAudioPlayer
+                                            .stop(); // Stop if already playing
+                                        playing = false;
+                                        clickedIndex = -1;
+                                      }
+                                    });
+                                  },
+                                  icon: Icon(
+                                    playing && index == clickedIndex
+                                        ? Icons.pause_circle
+                                        : Icons.play_circle,
+                                    size: 30,
+                                  ),
+                                ),
+                                ayah['sajda'] != false
+                                    ? SajdaAlert(
+                                        activeIndex: activeIndex,
+                                        activeTextProvider: activeTextProvider,
+                                        surahName: surahName,
+                                        ayah: ayah)
+                                    : const SizedBox(
+                                        width: 0,
+                                        height: 0,
+                                      )
+                              ],
+                            )
+                          ],
+                        ),
                       ),
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(20),
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 20),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '#$ayahNumber',
-                                style: GoogleFonts.inter(
-                                    fontSize: 18,
-                                    color: index == activeIndex &&
-                                            activeTextProvider.activeText ==
-                                                surahName
-                                        ? Colors.white
-                                        : Colors.black),
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 30),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Flexible(
-                                flex: 3,
-                                child: Text(
-                                  "${ayah['text']}",
-                                  textDirection: TextDirection.rtl,
-                                  style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: width > 600 ? size + 6 : size,
-                                      color: index == activeIndex &&
-                                              activeTextProvider.activeText ==
-                                                  surahName
-                                          ? Colors.white
-                                          : Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          Container(
-                            height: 2,
-                            width: double.infinity,
-                            // margin: EdgeInsets.symmetric(horizontal: 20),
-                            color: Colors.grey.shade300,
-                          ),
-                          const SizedBox(height: 15),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Flexible(
-                                flex: 3,
-                                child: Text(
-                                  textAlign: TextAlign.start,
-                                  "${ayahEnglish['text']}",
-                                  style: GoogleFonts.inter(
-                                      // fontWeight: FontWeight.bold,
-                                      fontSize: size - 2,
-                                      color: index == activeIndex &&
-                                              activeTextProvider.activeText ==
-                                                  surahName
-                                          ? Colors.white
-                                          : Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          Container(
-                            height: 2,
-                            width: double.infinity,
-                            // margin: EdgeInsets.symmetric(horizontal: 20),
-                            color: Colors.grey.shade300,
-                          ),
-                          const SizedBox(height: 15),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Flexible(
-                                flex: 3,
-                                child: Text(
-                                  textAlign: TextAlign.start,
-                                  "${ayahTranslate['text']}",
-                                  style: GoogleFonts.inter(
-                                      // fontWeight: FontWeight.bold,
-                                      fontSize: size - 2,
-                                      color: index == activeIndex &&
-                                              activeTextProvider.activeText ==
-                                                  surahName
-                                          ? Colors.white
-                                          : Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 40),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8.0),
-                                color: index == activeIndex &&
-                                        activeTextProvider.activeText ==
-                                            surahName
-                                    ? Colors.white
-                                    : CupertinoColors.activeGreen,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "Juzz/Para: ",
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 12,
-                                          color: index == activeIndex &&
-                                                  activeTextProvider
-                                                          .activeText ==
-                                                      surahName
-                                              ? Colors.grey.shade500
-                                              : Colors.grey.shade300,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      "${ayahEnglish['juz']}",
-                                      style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: index == activeIndex &&
-                                                  activeTextProvider
-                                                          .activeText ==
-                                                      surahName
-                                              ? Colors.black
-                                              : Colors.white),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    clickedIndex = index;
-                                    if (!playing) {
-                                      _assetsAudioPlayer.open(
-                                          Audio.network(ayahVoice['audio']));
-                                      _assetsAudioPlayer
-                                          .play(); // Start playing immediately
-                                      playing = true;
-                                    } else {
-                                      _assetsAudioPlayer
-                                          .stop(); // Stop if already playing
-                                      playing = false;
-                                      clickedIndex = -1;
-                                    }
-                                  });
-                                },
-                                icon: Icon(
-                                  playing && index == clickedIndex
-                                      ? Icons.pause_circle
-                                      : Icons.play_circle,
-                                  size: 30,
-                                ),
-                              ),
-                              ayah['sajda'] != false
-                                  ? Container(
-                                      padding: const EdgeInsets.all(8.0),
-                                      color: index == activeIndex &&
-                                              activeTextProvider.activeText ==
-                                                  surahName
-                                          ? Colors.white
-                                          : CupertinoColors.activeOrange,
-                                      child: Text(
-                                        'Sajda : ${ayah['sajda']['recommended'] == true ? '(Recommended)' : '(Obligatory)'}',
-                                        style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.bold,
-                                            color: index == activeIndex &&
-                                                    activeTextProvider
-                                                            .activeText ==
-                                                        surahName
-                                                ? Colors.black
-                                                : Colors.white,
-                                            fontSize: 12),
-                                      ),
-                                    )
-                                  : const SizedBox(
-                                      width: 0,
-                                      height: 0,
-                                    )
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              )
+                    );
+                  }),
             ],
           ),
         ),

@@ -18,7 +18,7 @@ class SurahListService {
   }
 }
 
-class SurahArabic {
+class SurahArabicX {
   static Future<Map<String, dynamic>> fetchQuranData(int index) async {
     try {
       final response = await http
@@ -77,6 +77,23 @@ class SurahEnglishTransliterationService {
       if (response.statusCode == 200) {
         final String jsonString = response.body;
         return json.decode(jsonString)["data"]["surahs"][index];
+      } else {
+        throw Exception("Failed to load data: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Error loading data: $e");
+    }
+  }
+}
+
+class AllSurahList{
+  static Future<Map<String, dynamic>> fetchQuranData() async {
+    try {
+      final response = await http
+          .get(Uri.parse("http://api.alquran.cloud/v1/surah"));
+      if (response.statusCode == 200) {
+        final String jsonString = response.body;
+        return json.decode(jsonString);
       } else {
         throw Exception("Failed to load data: ${response.statusCode}");
       }

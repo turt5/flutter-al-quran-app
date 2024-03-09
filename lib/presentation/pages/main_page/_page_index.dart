@@ -1,6 +1,9 @@
 import 'package:al_quran/data/_quran_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../search_page/_search.dart';
 import '_surah.dart'; // Assuming this contains SurahPage Widget
 import '../../widgets/_surah_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -79,6 +82,67 @@ class _IndexPageState extends State<IndexPage> {
       child: ListView(
         scrollDirection: Axis.vertical,
         children: [
+          const SizedBox(height: 20),
+          // Container(
+          //   padding: const EdgeInsets.all(20),
+          //   child: Text(
+          //     'Search',
+          //     style: GoogleFonts.inter(
+          //       fontSize: 20,
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(height: 20),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SearchPage(),
+                ),
+              );
+            },
+            child: Container(
+              height: 60,
+              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              width: width > 600 ? 700 : width,
+              decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade500,
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                      offset: Offset(5, 5),
+                    ),
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                      offset: const Offset(-5, -5),
+                    ),
+                  ]),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(Icons.search, color: Colors.grey.shade500, size: 18),
+                      const SizedBox(width: 10),
+                      Text("Search a surah",
+                          style: GoogleFonts.inter(
+                            color: Colors.grey.shade500,
+                          ))
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
           Container(
             padding: const EdgeInsets.all(20),
             child: Text(
@@ -90,29 +154,27 @@ class _IndexPageState extends State<IndexPage> {
           ),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(
-                jsonData['data']['surahs'].length,
-                (index) {
-                  final surah = jsonData['data']['surahs'][index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SurahPage(
-                            index: index,
-                          ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: jsonData['data']['surahs'].length,
+              itemBuilder: (context, index) {
+                final surah = jsonData['data']['surahs'][index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SurahPage(
+                          index: index,
                         ),
-                      );
-                    },
-                    child: SurahListItem(activeText: activeText, surah: surah),
-                  );
-                },
-              ),
+                      ),
+                    );
+                  },
+                  child: SurahListItem(activeText: activeText, surah: surah),
+                );
+              },
             ),
-          )
+          ),
         ],
       ),
     );

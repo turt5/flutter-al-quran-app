@@ -72,7 +72,6 @@ class Page3 extends StatelessWidget {
                             backgroundColor: CupertinoColors.activeBlue,
                             foregroundColor: Colors.white),
                         onPressed: () {
-                          setOpened();
                           Navigator.push(
                               context,
                               PageRouteBuilder(
