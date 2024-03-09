@@ -106,7 +106,7 @@ class _SearchPageState extends State<SearchPage> {
         // Navigate to Surah page
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return SurahPage(
-            index: index,
+            index: int.parse(result[index]['number']) - 1,
           );
         }));
       },
