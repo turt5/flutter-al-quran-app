@@ -79,83 +79,82 @@ class _IndexPageState extends State<IndexPage> {
     return Container(
       width: width > 600 ? 700 : width,
       alignment: Alignment.center,
-      child: ListView(
-        scrollDirection: Axis.vertical,
-        children: [
-          const SizedBox(height: 20),
-          // Container(
-          //   padding: const EdgeInsets.all(20),
-          //   child: Text(
-          //     'Search',
-          //     style: GoogleFonts.inter(
-          //       fontSize: 20,
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(height: 20),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SearchPage(),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            // Container(
+            //   padding: const EdgeInsets.all(20),
+            //   child: Text(
+            //     'Search',
+            //     style: GoogleFonts.inter(
+            //       fontSize: 20,
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchPage(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 60,
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                width: width > 600 ? 700 : width,
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade500,
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                        offset: Offset(5, 5),
+                      ),
+                      BoxShadow(
+                        color: Colors.grey.shade200,
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                        offset: const Offset(-5, -5),
+                      ),
+                    ]),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search,
+                            color: Colors.grey.shade500, size: 18),
+                        const SizedBox(width: 10),
+                        Text("Search a surah",
+                            style: GoogleFonts.inter(
+                              color: Colors.grey.shade500,
+                            ))
+                      ],
+                    )
+                  ],
                 ),
-              );
-            },
-            child: Container(
-              height: 60,
+              ),
+            ),
+            Container(
               padding: const EdgeInsets.all(20),
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              width: width > 600 ? 700 : width,
-              decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade500,
-                      blurRadius: 10,
-                      spreadRadius: 1,
-                      offset: Offset(5, 5),
-                    ),
-                    BoxShadow(
-                      color: Colors.grey.shade200,
-                      blurRadius: 10,
-                      spreadRadius: 1,
-                      offset: const Offset(-5, -5),
-                    ),
-                  ]),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(Icons.search, color: Colors.grey.shade500, size: 18),
-                      const SizedBox(width: 10),
-                      Text("Search a surah",
-                          style: GoogleFonts.inter(
-                            color: Colors.grey.shade500,
-                          ))
-                    ],
-                  )
-                ],
+              child: Text(
+                'Surahs',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                ),
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              'Surahs',
-              style: GoogleFonts.inter(
-                fontSize: 20,
-              ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            child: SingleChildScrollView(
-              physics: NeverScrollableScrollPhysics(),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: jsonData['data']['surahs'].length,
@@ -177,8 +176,8 @@ class _IndexPageState extends State<IndexPage> {
                 },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -161,16 +161,13 @@ class _SurahPageState extends State<SurahPage> {
       body: SafeArea(
           child: Center(
         child: Container(
-          width: width > 600 ? 800 : width,
-          alignment: Alignment.center,
-          child: ListView(
-            children: [
-              SingleChildScrollView(
-                physics: NeverScrollableScrollPhysics(),
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: widget.surah['ayahs'].length,
-                    itemBuilder: (context, index) {
+            width: width > 600 ? 800 : width,
+            alignment: Alignment.center,
+            child: CustomScrollView(
+              slivers: [
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
                       final ayah = widget.surah['ayahs']
                           [index]; // Access the current ayah
                       final ayahNumber = ayah[
@@ -244,7 +241,6 @@ class _SurahPageState extends State<SurahPage> {
                               Container(
                                 height: 2,
                                 width: double.infinity,
-                                // margin: EdgeInsets.symmetric(horizontal: 20),
                                 color: Colors.grey.shade300,
                               ),
                               const SizedBox(height: 15),
@@ -258,7 +254,6 @@ class _SurahPageState extends State<SurahPage> {
                               Container(
                                 height: 2,
                                 width: double.infinity,
-                                // margin: EdgeInsets.symmetric(horizontal: 20),
                                 color: Colors.grey.shade300,
                               ),
                               const SizedBox(height: 15),
@@ -321,11 +316,12 @@ class _SurahPageState extends State<SurahPage> {
                           ),
                         ),
                       );
-                    }),
-              ),
-            ],
-          ),
-        ),
+                    },
+                    childCount: widget.surah['ayahs'].length,
+                  ),
+                ),
+              ],
+            )),
       )),
     );
   }
